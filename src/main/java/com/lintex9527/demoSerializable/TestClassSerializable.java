@@ -33,6 +33,7 @@ public class TestClassSerializable {
 
         test_serial();
 
+        test_serial2();
     }
 
 
@@ -79,6 +80,56 @@ public class TestClassSerializable {
         }
         System.out.println("反序列化完成");
     }
+
+
+    /**
+     * 上面的测试是CupA 没有实现Serializable接口，但是子类CupB继承了；
+     * 这个测试中CupC继承自CupB，但是没有明确实现Serializable接口。理论上CupC是自动实现了Serializable接口。
+     *
+     * TODO: 继承关系CupA -- CupB -- CupC 但是反序列化得到CupC的时候，只是调用了CupA的无参的构造方法，而CupB,CupC的
+     * 任何构造方法都没有调用，说明反序列化不会使用new 来新建一个对象，只是强制转换了值，只是没有实现Serializable的部分值，就
+     * 必须调用对应的那一个类的无参的构造方法。
+     *
+     * 运行结果如下：
+     * CupA() 两个参数
+       CupB() 无参数
+       CupC() 一个参数
+       原始的: name = noname, size = 100, price = 80, age = 10
+       开始序列化
+       开始反序列化
+       CupA() 无参数
+       反序列化得到的：name = unknown, size = 0, price = 80, age = 10
+     */
+    private static void test_serial2() {
+        CupC cupC = new CupC(10);
+        System.out.println("原始的: " + cupC);
+
+        // 序列化
+        System.out.println("开始序列化");
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(SERIAL_FILE);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(cupC);
+            objectOutputStream.flush();
+            objectOutputStream.close();
+            fileOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 反序列化
+        System.out.println("开始反序列化");
+        try {
+            FileInputStream fileInputStream = new FileInputStream(SERIAL_FILE);
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            CupC newC = (CupC) objectInputStream.readObject();
+            System.out.println("反序列化得到的：" + newC);
+            objectInputStream.close();
+            fileInputStream.close();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 }
 
 
@@ -121,7 +172,7 @@ class CupB extends CupA implements Serializable {
     public CupB() {
         super("noname", 100);
         System.out.println("CupB() 无参数");
-        price = 0;
+        price = 80;
     }
 
     public CupB(int price) {
@@ -150,6 +201,7 @@ class CupC extends CupB {
 
     public CupC(int age) {
         this.age = age;
+        System.out.println("CupC() 一个参数");
     }
 
     @Override
