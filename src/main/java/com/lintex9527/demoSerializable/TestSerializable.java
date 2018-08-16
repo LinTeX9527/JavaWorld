@@ -18,7 +18,8 @@ public class TestSerializable {
 //        test_serial();
 //        test_deserial();
 
-        test_multi_serial();
+//        test_multi_serial();
+        test_multi_serial02();
     }
 
 
@@ -92,7 +93,7 @@ public class TestSerializable {
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
             // 直接写入这个列表，而不是一个一个对象的写入
             objectOutputStream.writeObject(peopleList);
-            objectOutputStream.flush(); // 写入之后最好调用 flush() 
+            objectOutputStream.flush(); // 写入之后最好调用 flush()
             objectOutputStream.close();
             fileOutputStream.close();
             System.out.println("\n序列化多个对象完成");
@@ -113,6 +114,58 @@ public class TestSerializable {
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
-
+        System.out.println("\n反序列化完成");
     }
+
+
+    /**
+     * 多个对象的序列化和反序列化
+     * 方法二：一个一个对象写入到文件，最后写入一个null对象；
+     * 读取的时候也要一个一个的读取，最后需要判断是否读到一个null对象标志结尾。
+     */
+    private static void test_multi_serial02() {
+        // 构建多个对象
+        List<People> peopleList = new ArrayList<People>();
+        peopleList.add(new People("LiLei", 12));
+        peopleList.add(new People("Hanmeimei", 11));
+        peopleList.add(new People("Xiaoming", 12));
+        System.out.print(peopleList.toString());
+
+        // 序列化
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(PEOPLE_PATH);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            // 将对象一个一个的写入到文件中
+            for (People aPeopleList : peopleList) {
+                objectOutputStream.writeObject(aPeopleList);
+            }
+            // 最后以一个null对象表示结束
+            objectOutputStream.writeObject(null);
+            objectOutputStream.flush(); // 写入之后最好调用 flush()
+            objectOutputStream.close();
+            fileOutputStream.close();
+            System.out.println("\n序列化多个对象完成");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 反序列化
+        List<People> xList = new ArrayList<People>();
+        People xPeople = null;
+        try {
+            FileInputStream fileInputStream = new FileInputStream(PEOPLE_PATH);
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            // 和上面的写入过程对应，这里一个一个的读出来
+            while ((xPeople = (People) objectInputStream.readObject()) != null){
+                xList.add(xPeople);
+            }
+            System.out.println(xList.toString());
+            objectInputStream.close();
+            fileInputStream.close();
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("\n反序列化完成");
+    }
+
 }
