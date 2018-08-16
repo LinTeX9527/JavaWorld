@@ -49,7 +49,7 @@ public class TestClassSerializable {
     private static void test_serial() {
         // 初始化对象也指定了父对象中的2个成员的值
         CupB cupB = new CupB("Mark", 12, 6);
-        System.out.println(cupB);
+        System.out.println("原始的: " + cupB);
         // 序列化
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(SERIAL_FILE);
@@ -67,8 +67,10 @@ public class TestClassSerializable {
         try {
             FileInputStream fileInputStream = new FileInputStream(SERIAL_FILE);
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            // TODO: 原来这里的反序列化直接转换对象为CupB，并没有new CupB()，所以没有调用 CupB的构造方法，
+            // 但是为了重建CupB里面的父对象的元素，所以这里调用了父类无参的构造方法。
             CupB newb = (CupB) objectInputStream.readObject();
-            System.out.println(newb);
+            System.out.println("反序列化得到: " + newb);
 
             objectInputStream.close();
             fileInputStream.close();
@@ -94,11 +96,13 @@ class CupA {
     public CupA() {
         name = "unknown";
         size = 0;
+        System.out.println("CupA() 无参数");
     }
 
     public CupA(String name, int size) {
         this.name = name;
         this.size = size;
+        System.out.println("CupA() 两个参数");
     }
 
     @Override
@@ -116,16 +120,19 @@ class CupB extends CupA implements Serializable {
 
     public CupB() {
         super("noname", 100);
+        System.out.println("CupB() 无参数");
         price = 0;
     }
 
     public CupB(int price) {
         super("nameXX", 200);
+        System.out.println("CupB() 一个参数");
         this.price = price;
     }
 
     public CupB(String name, int size, int price) {
         super(name, size);
+        System.out.println("CupB() 3个参数");
         this.price = price;
     }
 
