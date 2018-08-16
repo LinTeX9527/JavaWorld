@@ -36,6 +36,7 @@ public class TestSerializable {
             FileOutputStream fileOutputStream = new FileOutputStream(PEOPLE_PATH);
             ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
             out.writeObject(people);
+            out.flush(); // 写入之后最后进行 flush() 操作。
             out.close();
             fileOutputStream.close();
             System.out.println("Serialized People in " + PEOPLE_PATH);
@@ -75,7 +76,7 @@ public class TestSerializable {
      *
      * 在反序列化时遇到java.io.EOFException 参考：
      * https://blog.csdn.net/ysk_xh_521/article/details/77396696
-     * 
+     *
      */
     private static void test_multi_serial() {
         // 构建多个对象
@@ -91,6 +92,7 @@ public class TestSerializable {
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
             // 直接写入这个列表，而不是一个一个对象的写入
             objectOutputStream.writeObject(peopleList);
+            objectOutputStream.flush(); // 写入之后最好调用 flush() 
             objectOutputStream.close();
             fileOutputStream.close();
             System.out.println("\n序列化多个对象完成");
