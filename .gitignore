@@ -1,0 +1,5 @@
+# 工程创建时需要忽略的文件
+.gradle/
+.idea/
+out/
+temp/
