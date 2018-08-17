@@ -19,7 +19,8 @@ public class TestSerializable {
 //        test_deserial();
 
 //        test_multi_serial();
-        test_multi_serial02();
+//        test_multi_serial02();
+        test_serial_two_kinds();
     }
 
 
@@ -166,6 +167,51 @@ public class TestSerializable {
             e.printStackTrace();
         }
         System.out.println("\n反序列化完成");
+    }
+
+
+    /**
+     * 同一个序列化文件中存入两个不同类型的对象，是否可以，以及能否正确还原两个对象？
+     * 经过验证，一个文件可保存多个序列化的对象，可以是不同类型的。
+     * 反序列化只要保持读取和写入的顺序一致既可以恢复。
+     */
+    private static void test_serial_two_kinds() {
+        People people = new People("James", 12);
+        Animal animal = new Animal("Dog", 2);
+        System.out.println("原始的对象：" + people);
+        System.out.println("原始的对象：" + animal);
+        System.out.println("开始序列化");
+
+        // 序列化
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(PEOPLE_PATH);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(people);
+            objectOutputStream.writeObject(animal);
+            objectOutputStream.writeObject(null);
+            objectOutputStream.flush();
+            objectOutputStream.close();
+            fileOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 反序列化
+        People xpeople = null;
+        Animal xanimal = null;
+        try {
+            FileInputStream fileInputStream = new FileInputStream(PEOPLE_PATH);
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            xpeople = (People) objectInputStream.readObject();
+            xanimal = (Animal) objectInputStream.readObject();
+
+            objectInputStream.close();
+            fileInputStream.close();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        System.out.println("反序列化得到的对象：" + xpeople);
+        System.out.println("反序列化得到的对象：" + xanimal);
     }
 
 }
