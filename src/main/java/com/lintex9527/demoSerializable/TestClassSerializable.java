@@ -31,10 +31,10 @@ public class TestClassSerializable {
      */
     public static void main(String[] args) {
 
-        test_serial();
+//        test_serial();
 
         test_serial2();
-    }
+    } // main().
 
 
     /**
@@ -134,9 +134,45 @@ public class TestClassSerializable {
 
 
 /**
+ * 反序列化时追本溯源
+ * =================
+ * 在进行反序列化的步骤时，直接强制进行类型转换，追溯父类、父父类中是否实现了Serializable接口，如果实现了就能够恢复值，如果没有实现，
+ * 就调用父类或这父父类中无参数的构造方法，一级一级玩上面调用。
+ */
+class CupRoot {
+    // 表示类的继承等级，CupRoot为最初的一级，level = 0
+    private static int level = 0;
+
+    // 容量
+    float capability;
+
+    public CupRoot() {
+        System.out.println("CupRoot() 无参");
+    }
+
+    public CupRoot(float capability) {
+        System.out.println("CupRoot() 1个参数");
+        this.capability = capability;
+    }
+
+    @Override
+    public String toString() {
+        return "level = " + level;
+    }
+
+    public static int getLevel() {
+        return level;
+    }
+
+    public static void setLevel(int level) {
+        CupRoot.level = level;
+    }
+}
+
+/**
  * CupA 不实现Serializable 接口，但是CupB 实现，而CupC 是继承CupB的，所以 CupC 也是实现了Serializable 接口的。
  */
-class CupA {
+class CupA extends CupRoot{
     String name;
     int size;
 
@@ -145,12 +181,14 @@ class CupA {
      * 必须要有，可以为空，否则对CupB对象反序列化会出现 java.io.InvalidClassException 。
      */
     public CupA() {
+        super(0.01F);
         name = "unknown";
         size = 0;
         System.out.println("CupA() 无参数");
     }
 
     public CupA(String name, int size) {
+        super(22.2F);
         this.name = name;
         this.size = size;
         System.out.println("CupA() 两个参数");
@@ -158,7 +196,7 @@ class CupA {
 
     @Override
     public String toString() {
-        return "name = " + name + ", size = " + size;
+        return super.toString() + ", name = " + name + ", size = " + size;
     }
 }
 
