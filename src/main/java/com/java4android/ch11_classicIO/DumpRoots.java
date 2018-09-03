@@ -20,6 +20,7 @@ public class DumpRoots {
         }
 
         createFiles();
+        createDirs();
     }
 
     /**
@@ -50,4 +51,41 @@ public class DumpRoots {
 //            file.delete();
         }
     }
+
+
+    /**
+     * file.mkdir() 和 mkdirs() 的区别在于：
+     * mkdirs() 会把路径中确实的部分全都创建，而mkdir()检查到某个目录不能存在则新建目录失败。
+     *
+     * 需要注意 file.delete() 只删除路径中最后的一个目录，其余的都保留。
+     * 例如下面的例子只删除了 path02 中的 dir03
+     */
+    private static void createDirs() {
+        String path01 = "temp/dir01";
+        String path02 = "temp/testdir/dir01/dir02/dir03";
+
+        File file = new File(path02);
+        if (file.exists()) {
+            System.out.println(file.getAbsolutePath() + "目录已经存在");
+        } else {
+            if(file.mkdirs()) {
+                System.out.println(file.getAbsolutePath() + "目录新建成功");
+            } else {
+                System.out.println(file.getAbsolutePath() + "目录新建失败");
+            }
+        }
+
+        if (file.delete()) {
+            System.out.println(file.getAbsolutePath() + "目录删除成功");
+        } else {
+            System.out.println(file.getAbsolutePath() + "目录删除失败");
+        }
+        File dir = new File("temp/testdir");
+        if (dir.delete()){
+            System.out.println(dir.getAbsolutePath() + "删除成功");
+        } else {
+            System.out.println(dir.getAbsolutePath() + "删除失败");
+        }
+    }
+
 }
