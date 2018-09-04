@@ -78,13 +78,15 @@ public class DumpRoots {
             }
         }
 
-        if (file.delete()) {
-            System.out.println(file.getAbsolutePath() + "目录删除成功");
-        } else {
-            System.out.println(file.getAbsolutePath() + "目录删除失败");
-        }
+//        if (file.delete()) {
+//            System.out.println(file.getAbsolutePath() + "目录删除成功");
+//        } else {
+//            System.out.println(file.getAbsolutePath() + "目录删除失败");
+//        }
         File dir = new File("temp/testdir");
         listDirs(dir, 0);
+        deleteDirs(new File("temp/testdir"));
+
 //        if (dir.delete()){
 //            System.out.println(dir.getAbsolutePath() + "删除成功");
 //        } else {
@@ -95,9 +97,8 @@ public class DumpRoots {
 
     /**
      * 列出目录下的子目录以及文件以及子目录下的所有文件。
-     * @param dir
+     * @param dir 起始目录
      * @param depth 记录目录深度，起始的深度为0
-     * @return
      */
     public static void listDirs(@NotNull File dir, int depth) {
         // 目录下对应的所有子目录和文件列表
@@ -123,6 +124,30 @@ public class DumpRoots {
                 }
             }
         }
+    }
+
+
+    /**
+     * 递归删除整个目录
+     * @param dir 起始目录
+     * @return
+     */
+    public static boolean deleteDirs(File dir) {
+        boolean retval = true;
+        if (dir.exists()){
+            File[] dirContents = dir.listFiles();
+            if (dirContents != null && dirContents.length > 0) {
+                for (File tempfile : dirContents) {
+                    if (tempfile.isDirectory()) {
+                        deleteDirs(tempfile);       // 删除目录下的目录
+                        retval = tempfile.delete(); // 删除这个目录
+                    } else { // 删除当前目录中的文件文件
+                        retval = tempfile.delete();
+                    }
+                }
+            }
+        }
+        return retval;
     }
 
 }
