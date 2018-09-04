@@ -24,6 +24,7 @@ public class DumpRoots {
 
         createFiles();
         createDirs();
+        pathnameInfo();
     }
 
     /**
@@ -150,4 +151,30 @@ public class DumpRoots {
         return retval;
     }
 
+    private static void pathnameInfo() {
+        String[] pathnames = new String[]{"temp/serial.ser", "temp/testdir", "temp/testdir/dir01/../dirXXX"};
+
+        for (String path: pathnames) {
+            System.out.println("------------------------------------");
+            System.out.println("当前文件路径：" + path);
+            File file = new File(path);
+            try {
+                // getAbsolutePaht() 会包含 ./ 和 ../ 进行跳转的路径
+                System.out.println("Absolute path = " + file.getAbsolutePath());
+
+                // getCanonicalPaht() 不包括./ 和 ../ 进行跳转的路径，直接的表示文件在系统的绝对路径
+                System.out.println("Canonical path = " + file.getCanonicalPath()); // 可能会产生异常
+
+                // getName() 即文件或者目录最后一层的名字
+                System.out.println("Name = " + file.getName());
+
+                // getPaht() 表示通过 new File()构造方法传入的路径
+                System.out.println("Path = " + file.getPath());
+
+                System.out.println("Is absolute = " + file.isAbsolute());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
