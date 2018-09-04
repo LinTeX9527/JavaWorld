@@ -1,5 +1,7 @@
 package com.java4android.ch11_classicIO;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -13,6 +15,7 @@ import java.io.IOException;
  * 例如Windows返回的是： [C:\, D:\, E:\]，而Linux/Unix平台返回的是/
  */
 public class DumpRoots {
+
     public static void main(String[] args) {
         File[] roots = File.listRoots();
         for (File root: roots) {
@@ -81,10 +84,44 @@ public class DumpRoots {
             System.out.println(file.getAbsolutePath() + "目录删除失败");
         }
         File dir = new File("temp/testdir");
-        if (dir.delete()){
-            System.out.println(dir.getAbsolutePath() + "删除成功");
-        } else {
-            System.out.println(dir.getAbsolutePath() + "删除失败");
+        listDirs(dir, 0);
+//        if (dir.delete()){
+//            System.out.println(dir.getAbsolutePath() + "删除成功");
+//        } else {
+//            System.out.println(dir.getAbsolutePath() + "删除失败");
+//        }
+    }
+
+
+    /**
+     * 列出目录下的子目录以及文件以及子目录下的所有文件。
+     * @param dir
+     * @param depth 记录目录深度，起始的深度为0
+     * @return
+     */
+    public static void listDirs(@NotNull File dir, int depth) {
+        // 目录下对应的所有子目录和文件列表
+        String[] dirContents = null;
+        if (dir.exists()) {
+            dirContents = dir.list();
+            if (depth++ == 0) { // 无论目录深度为几，这条语句执行之后depth必然会加1
+                System.out.println(dir.getName() + "/");
+            }
+            if (null != dirContents) {
+                for (String file: dirContents) { // 列出所有的文件
+                    for(int i = 0; i < depth; i++) {
+                        System.out.print("\t");
+                    }
+                    System.out.print("|----");
+                    File tempfile = new File(dir, file);
+                    if (tempfile.isDirectory()) {
+                        System.out.println(tempfile.getName() + "/");
+                        listDirs(tempfile, depth);
+                    } else {
+                        System.out.println(tempfile.getName());
+                    }
+                }
+            }
         }
     }
 
